@@ -15,32 +15,24 @@ interface Props {
   movie: Movie | StoredMovie
 }
 function MovieCard({ movie }: Props) {
-  const [menuOpen, setMenuOpen] = useState(false)
   const percentage = (movie.voteAverage * 10).toPrecision(2);
   const color = movie.voteAverage > 7 ? "#0FF207" : "#EBF305"
   const userInfo = useSelector(selectUserInfo)
   const dispatch = useDispatch<AppDispatch>()
-  document.documentElement.onclick = () => {
-    if (menuOpen) {
-      setMenuOpen(false)
-    }
-  }
-  const isHistory = () => userInfo!.moviesHistory.some(mvs => mvs.id == movie.id)
-  const isWatchlist = () => userInfo!.moviesWatchlist.some(mvs => mvs.id == movie.id)
+ 
+  const isHistory = () => userInfo!.savedMovies.some(mvs => mvs.id == movie.id && mvs.list=="history")
+  const isWatchlist = () => userInfo!.savedMovies.some(mvs => mvs.id == movie.id && mvs.list=="watchList")
 
-  const toggleLocal = (key: string) => {
+  const toggleLocal = (list: string) => {
     const movieDetails = {
       id: movie.id, title: movie.title,
       releaseDate: movie.releaseDate, 
       voteAverage: movie.voteAverage,
       posterPath: movie.posterPath
     }
-    dispatch(toggleMovie({key,movie:movieDetails,add:isAdded(key)}))
+    dispatch(toggleMovie({list,movie:movieDetails,add:(isHistory()||isWatchlist())}))
   }
-  function isAdded(key:any){
-    if(key=='watchList')return isWatchlist()
-    return isHistory()
-  }
+ 
   return (
     //155 225
     <div className=' shadow-sm rounded-lg relative   min-w-[150px] w-[150px] ' >
@@ -84,27 +76,8 @@ function MovieCard({ movie }: Props) {
           )}
         </Menu>
       </div>
-      {/* <div className=" inline-block   w-full" >
-        <button   onClick={(ev) => {ev.stopPropagation();setMenuOpen(e => !e)}} className="w-6 h-6 hover:bg-blue-300 bg-slate-300  flex relative float-right top-2 right-2  justify-center items-center rounded-full hover:cursor-pointer">
-          <EllipsisHorizontalIcon />
-        </button>
+     
 
-        {menuOpen&&(<ul  className={`absolute text-left top-8 left-20 w-full z-10 text-gray-700 pt-1 `}>
-          <li onClick={(e) => { toggleLocal('watchList');}} className="flex rounded-t items-center hover:bg-gray-400 bg-white">
-            <BookmarkIcon className="w-4 ml-2 " color={isWatchlist() ? 'red' : 'black'} />
-            <button className=" py-2 px-4 block whitespace-no-wrap" >
-              Watchlist
-            </button>
-
-          </li>
-          <li onClick={() => toggleLocal('history')} className="flex rounded-b  items-center hover:bg-gray-400 bg-white">
-            <HeartIcon className="w-4 ml-2 " color={isHistory() ? 'red' : 'black'} />
-            <button className=" py-2 px-4 block " >
-              Mark Watched
-            </button>
-          </li>
-        </ul>)}
-      </div> */}
       <div className='p-2 mt-5'>
         <Link to={`/movies/${movie.id}`}>
           <a className=' text-[1em] hover:text-myblue'>{movie.title}</a>

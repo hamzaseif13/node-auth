@@ -3,7 +3,8 @@ const localStrategy = require('passport-local').Strategy;
 const UserModel = require('../model/User');
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
-const {jwtSecret} = require('../config')
+const config =require('../config')
+
 // ...
 
 passport.use(
@@ -41,9 +42,11 @@ passport.use(
       async (email, password, done) => {
         try {
           const user = await UserModel.findOne({ email });
+          
           if (!user) {
             return done(null, false, { message: 'User not found' });
           }
+
           const validate = await user.isValidPassword(password);
   
           if (!validate) {
@@ -59,7 +62,7 @@ passport.use(
 passport.use(
   new JWTstrategy(
     {
-      secretOrKey: jwtSecret,
+      secretOrKey:  config.jwtSecret,
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken()
     },
     async (token, done) => {

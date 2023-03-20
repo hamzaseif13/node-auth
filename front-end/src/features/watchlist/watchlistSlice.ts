@@ -18,6 +18,7 @@ export interface StoredMovie{
     releaseDate:string
     voteAverage:number
     posterPath?:string
+    list?:string
 }
 const watchlistSlice = createSlice({
     name:"watchlist",
@@ -31,17 +32,7 @@ const watchlistSlice = createSlice({
     }
 })
 
-function saveToLocal(key:string,items:StoredMovie[]){
-    localStorage.setItem(key,JSON.stringify(items))
-}
-function isStored(key:string,item:StoredMovie):boolean{
-    const items = localStorage.getItem(key)
-    if(items){
-        const parsed = JSON.parse(items);
-        return parsed.some((itm:any)=>item.id==itm.id)
-    }
-    return false;
-}
+
 export default watchlistSlice.reducer
 
 export const selectLang = (state:RootState) => state.watchlistReducer.lang

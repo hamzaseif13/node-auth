@@ -6,7 +6,7 @@ const MovieSchema = new mongoose.Schema({
     releaseDate: { type: String, require: true },
     voteAverage: { type: Number, require: true },
     posterPath: String,
-    list:String
+    list:{ type: String, require: true }
 })
 
 const MovieModel = mongoose.model('movie', MovieSchema);

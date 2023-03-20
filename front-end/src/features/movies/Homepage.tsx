@@ -6,15 +6,21 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchDiscoverMovies, getDiscoverMovies, getStatus } from './moviesSlice'
 import { AppDispatch } from '../../store/store'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { selectUserInfo } from '../auth/authSlice'
+import { useNavigate } from 'react-router-dom'
 function Homepage() {
   const discoverMovies = useSelector(getDiscoverMovies)
   const status = useSelector(getStatus)
+  const userInfo = useSelector(selectUserInfo)
   const dispatch = useDispatch<AppDispatch>();
   const [active,setActive] = useState(true)
+  const navigate = useNavigate()
   useEffect(() => {
     dispatch(fetchDiscoverMovies(active?'day':'week'))
   }, [active])  
-  
+  if(!userInfo){
+    navigate("/login")
+  }
   return (
     <main className=''>
       <MoviesLanding />

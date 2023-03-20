@@ -12,6 +12,9 @@ services:
     depends_on:
       - mongodb
     build: ./
+    environment:
+      - NODE_ENV=production
+
     restart: unless-stopped
     ports:
       - 5050:5050

@@ -39,23 +39,21 @@ function SingleMovie() {
     fetchMovie();
 
   }, [id])
-  
-  const isHistory = () => userInfo!.moviesHistory.some(mvs => mvs.id == movie.id)
-  const isWatchlist = () => userInfo!.moviesWatchlist.some(mvs => mvs.id == movie.id)
+  const isHistory = () => userInfo!.savedMovies.some(mvs => mvs.id == movie.id && mvs.list=="history")
+  const isWatchlist = () => userInfo!.savedMovies.some(mvs => mvs.id == movie.id && mvs.list=="watchList")
   if (loading) return <h1>Loading ...</h1>
   if (error) return <h1>Movie {id} Doesnt exist</h1>
-  const toggleLocal= (key:string)=>{
+  const toggleLocal= (list:string)=>{
     const movieDetails = {
-      id: movie.id, title: movie.title,
-      releaseDate: movie.release_date, voteAverage: movie.vote_average,
+      id: movie.id, 
+      title: movie.title,
+      releaseDate: movie.release_date, 
+      voteAverage: movie.vote_average,
       posterPath: movie.poster_path
     }
-       dispatch(toggleMovie({key,movie:movieDetails,add:isAdded(key)}))
+       dispatch(toggleMovie({list,movie:movieDetails,add:(isHistory()||isWatchlist())}))
   }
-  function isAdded(key:any){
-    if(key=='watchList')return isWatchlist()
-    return isHistory()
-  }
+ 
   const openTrailer = () => {
     setShowModal(true)
   }

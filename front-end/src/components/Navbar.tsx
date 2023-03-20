@@ -42,7 +42,7 @@ function Navbar() {
         <header className='bg-darkblue' >
             <nav className='flex items-center m-auto max-w-main px-10  shadow-md justify-between   h-16'>
                 <div>
-                    <Link to="/">
+                    <Link  to="/">
                         <img className='w-[154px] h-[20px] min-w-[154px] min-h-[20px]' src={logo} alt="" />
                     </Link>
                 </div>

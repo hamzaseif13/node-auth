@@ -1,5 +1,5 @@
 import { Box, Flex, Menu, MenuButton } from '@chakra-ui/react'
-import { Badge } from '@mui/material'
+import { Badge, CircularProgress } from '@mui/material'
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { selectUserInfo } from '../auth/authSlice'
@@ -8,7 +8,8 @@ import MovieCard from '../movies/MovieCard'
 function History() {
   const [isHistory, setIsHistory] = useState(true)
   const userInfo = useSelector(selectUserInfo)
-  const list = isHistory ? userInfo?.moviesHistory : userInfo?.moviesWatchlist;
+  if(!userInfo)return <CircularProgress/> 
+  const list = isHistory ? userInfo?.savedMovies.filter((m)=>m.list=='watchList') : userInfo?.savedMovies.filter((m)=>m.list=='history') ;
   return (
     <main className=' m-auto max-w-main px-10 mt-10 min-h-[50vh]'>
       <div className=' border-darkblue border rounded-full flex w-fit mb-10'>

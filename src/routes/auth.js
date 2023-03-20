@@ -2,22 +2,19 @@ const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken')
 const router = express.Router();
-const {jwtSecret} = require('../config')
-router.post(
-    '/signup',
-    passport.authenticate('signup', { session: false }),
-    async (req, res, next) => {
-        res.json({
+const config = require('../config')
+
+router.post('/signup', passport.authenticate('signup', { session: false }), async (req, res, next) => {
+    res.json(
+        {
             message: 'Signup successful',
             user: req.user
-        });
-    }
+        }
+    );
+}
 );
 
-router.post(
-    '/login',
-    async (req, res, next) => {
-        passport.authenticate(
+router.post('/login', async (req, res, next) => {passport.authenticate(
             'login',
             async (err, user, info) => {
                 try {
@@ -31,13 +28,15 @@ router.post(
                         async (error) => {
                             if (error) return next(error);
                             const body = { _id: user._id, email: user.email };
-                            const token = jwt.sign({ user: body}, jwtSecret);
-                            return res.json({ token,user:{
-                                _id:user._id,
-                                email:user.email,
-                                moviesWatchlist:user.moviesWatchlist,
-                                moviesHistory:user.moviesHistory
-                            }});
+                            const token = jwt.sign({ user: body }, config.jwtSecret);
+                            return res.json({
+                                token, user: {
+                                    _id: user._id,
+                                    email: user.email,
+                                    savedMovies: user.savedMovies,
+                                    name: user.name
+                                }
+                            });
                         }
                     );
                 } catch (error) {
