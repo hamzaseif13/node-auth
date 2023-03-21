@@ -18,19 +18,8 @@ const UserSchema = new mongoose.Schema({
     savedMovies: [{
         type: mongoose.Schema.Types.ObjectId, ref: "movie", default: []
     }],
-    
-
 });
 
-// UserSchema.pre(
-//     'save',
-//     async function (next) {
-//         const user = this;
-//         const hash = await bcrypt.hash(this.password, 10);
-//         this.password = hash;
-//         next();
-//     }
-// );
 
 UserSchema.methods.isValidPassword = async function (password) {
     const user = this;
@@ -38,6 +27,8 @@ UserSchema.methods.isValidPassword = async function (password) {
     return compare; 
 }
 
+
+// hashing and salting the password before saving new user
 UserSchema.pre("save", function (next) {
     const user = this
     if (this.isModified("password") || this.isNew) {

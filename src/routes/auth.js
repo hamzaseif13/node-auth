@@ -1,50 +1,53 @@
 const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken')
-const router = express.Router();
 const config = require('../config')
+const UserModel = require("../model/User")
+const router = express.Router();
 
-router.post('/signup', passport.authenticate('signup', { session: false }), async (req, res, next) => {
-    res.json(
-        {
-            message: 'Signup successful',
-            user: req.user
+router.post("/signup", async (req, res) => {
+    try {
+        const user = await UserModel.findOne({ email: req.body.email })
+        if (user) {
+            return res.status(400).json({ message: "Email already exists" });
         }
-    );
-}
-);
+        const newUser = await UserModel.create({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password
+        });
 
-router.post('/login', async (req, res, next) => {passport.authenticate(
-            'login',
-            async (err, user, info) => {
-                try {
-                    if (err || !user) {
-                        const error = new Error('An error occurred.');
-                        return next(error);
-                    }
-                    req.login(
-                        user,
-                        { session: false },
-                        async (error) => {
-                            if (error) return next(error);
-                            const body = { _id: user._id, email: user.email };
-                            const token = jwt.sign({ user: body }, config.jwtSecret);
-                            return res.json({
-                                token, user: {
-                                    _id: user._id,
-                                    email: user.email,
-                                    savedMovies: user.savedMovies,
-                                    name: user.name
-                                }
-                            });
-                        }
-                    );
-                } catch (error) {
-                    return next(error);
-                }
-            }
-        )(req, res, next);
+        res.status(201).json({
+            user: newUser,
+            message: "Signup Successfully"
+        })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
-);
+})
+
+router.post("/login", async (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    try {
+        const user = await UserModel.findOne({ email })
+        if (!user) {
+            return res.status(404).json({ message: "Email not found" });
+        }
+        const validate = await user.isValidPassword(password);
+        if (!validate) {
+            return res.status(400).json({ message: "incorrect password" })
+        }
+        const body = { _id: user._id, email: user.email };
+        const token = jwt.sign({ user: body }, config.jwtSecret);
+        delete user.password;
+        return res.json({ token, user });
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: "Something Went Wrong" })
+    }
+
+});
+
 
 module.exports = router;
