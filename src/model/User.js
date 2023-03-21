@@ -13,7 +13,8 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        select:false
     },
     savedMovies: [{
         type: mongoose.Schema.Types.ObjectId, ref: "movie", default: []
