@@ -30,7 +30,7 @@ router.post("/login", async (req, res) => {
     const email = req.body.email;
     const newPassword = req.body.password;
     try {
-        const user = await UserModel.findOne({ email })
+        const user = await UserModel.findOne({ email }).select("+password")
         if (!user) {
             return res.status(404).json({ message: "Email not found" });
         }
