@@ -6,7 +6,6 @@ const router = express.Router();
 router.get('/user/profile', async (req, res) => {
   try {
     const user = await UserModel.findById(req.user._id).populate("savedMovies")
-    delete user.password
     res.json({ user })
   } catch (error) {
     res.status(404).json({ error: "not found" })
