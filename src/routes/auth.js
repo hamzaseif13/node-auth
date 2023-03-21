@@ -16,9 +16,9 @@ router.post("/signup", async (req, res) => {
             email: req.body.email,
             password: req.body.password
         });
-
+        const {password,...responseUser} = newUser._doc;
         res.status(201).json({
-            user: newUser,
+            user: responseUser,
             message: "Signup Successfully"
         })
     } catch (error) {
@@ -28,20 +28,20 @@ router.post("/signup", async (req, res) => {
 
 router.post("/login", async (req, res) => {
     const email = req.body.email;
-    const password = req.body.password;
+    const newPassword = req.body.password;
     try {
         const user = await UserModel.findOne({ email })
         if (!user) {
             return res.status(404).json({ message: "Email not found" });
         }
-        const validate = await user.isValidPassword(password);
+        const validate = await user.isValidPassword(newPassword);
         if (!validate) {
             return res.status(400).json({ message: "incorrect password" })
         }
         const body = { _id: user._id, email: user.email };
         const token = jwt.sign({ user: body }, config.jwtSecret);
-        delete user.password;
-        return res.json({ token, user });
+        const {password,...responseUser} = newUser._doc;
+        return res.json({ token, user:responseUser });
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: "Something Went Wrong" })
